@@ -3,10 +3,13 @@
 {%block title %} Home {% endblock %}
 
 {% block main %}
-<h2>{{survey_one.title}}</h2>
+<h2>{{survey}}</h2>
 <p>Instructions:</p>
-<p>Answer the questions, click Begin to begin</p>
+<p>{{instrucs}}</p>
 
-<button>Begin</button>
+<form action="/questions/0">
+    <button type="submit">Begin</button>
+</form>
+
 
 {% endblock %}

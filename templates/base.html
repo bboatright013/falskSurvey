@@ -12,6 +12,9 @@
         <link rel="stylesheet" href="/static/styles.css">
     </head>
     <body>
+        {% for msg in get_flashed_messages() %}
+            <p>{{msg}}</p>
+        {% endfor %}
         {% block main %}
 
         {% endblock %}

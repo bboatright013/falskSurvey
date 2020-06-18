@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %} Congrats {% endblock%}
+
+{% block main%}
+    <p>Thank you for completing the survey!</p>
+    <p>{{responses}}</p>
+
+    <form action="/">
+    <button type="submit">Home</button>
+    </form>
+
+{% endblock%}
