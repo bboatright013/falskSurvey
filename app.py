@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = 'mykey'
 app.debug = True
 
 debug = DebugToolbarExtension(app)
-
+DEBUG_TB_INTERCEPT_REDIRECTS = False
 responses =[]
 
 @app.route('/')
