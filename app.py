@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -9,8 +9,8 @@ app.config['SECRET_KEY'] = 'mykey'
 app.debug = True
 
 debug = DebugToolbarExtension(app)
-DEBUG_TB_INTERCEPT_REDIRECTS = False
-responses =[]
+# DEBUG_TB_INTERCEPT_REDIRECTS = False
+# responses =[]
 
 @app.route('/')
 def get_root():
@@ -21,31 +21,44 @@ def get_root():
 
 @app.route('/complete')
 def fin():
-    return render_template("survey_complete.html", responses = responses)
+    return render_template("survey_complete.html", responses = session['answers'])
+
+@app.route('/begin', methods=['POST', 'GET', 'HEAD'])
+def begin():
+    session['answers'] = []
+    return redirect('/questions/0')
 
 
 @app.route('/questions/<int:question>')
 def get_questions(question):
-    length = len(satisfaction_survey.questions)
-    answered = len(responses)
-    if question == answered:
-        if question < length:
-            return render_template("questions.html", question=question,
-            question_text = satisfaction_survey.questions[question].question,
-            question_ans = satisfaction_survey.questions[question].choices,
-            )
+    is_answered = len(session['answers'])
+    if is_answered <= len(satisfaction_survey.questions):
+        length = len(satisfaction_survey.questions)
+        answered = len(session['answers'])
+        if question == answered:
+            if question < length:
+                return render_template("questions.html", question=question,
+                question_text = satisfaction_survey.questions[question].question,
+                question_ans = satisfaction_survey.questions[question].choices,
+                )
+            else:
+                return redirect('/complete')
         else:
-            return redirect('/complete')
+            flash("Please answer this question")
+            return redirect(f'/questions/{answered}')
     else:
-        flash("Please answer this question")
-        return redirect(f'/questions/{answered}')
+        flash("Survey Complete")
+        return redirect('/')
 
 
 @app.route('/answers/<int:question>', methods=["POST"])
 def post_answer(question):
     if request.form.get("answer"):
         answer = request.form.get("answer")
-        responses.append(answer)
+        # responses.append(answer)
+        tmp_ans = session['answers']
+        tmp_ans.append(answer)
+        session['answers'] = tmp_ans
     question = question
 
     return redirect(f'/questions/{question + 1}')
